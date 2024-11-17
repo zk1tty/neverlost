@@ -7,8 +7,8 @@ import {
   useUser,
 } from "@account-kit/react";
 import { UserCard } from "@/components/UserCard";
-import signer from "./signer";
-import { createModularAccountAlchemyClient } from "@account-kit/smart-contracts";
+import { createWalletClient, http } from "viem";
+import { AlchemyWebSigner } from "@account-kit/signer";
 import { sepolia, alchemy } from "@account-kit/infra";
 import { LocalAccountSigner } from "@aa-sdk/core";
 import { generatePrivateKey } from "viem/accounts";
@@ -16,11 +16,7 @@ import { generatePrivateKey } from "viem/accounts";
 
 // Point
 // 1. How to add additional signers to your generated Modular Account?
-const createAlchemyClient = () => createModularAccountAlchemyClient({
-  transport: alchemy({ apiKey: "6T7baoAXg8g7fSAuA9RPQQLAP4e9Y7Lm" }),
-  chain: sepolia,
-  signer: LocalAccountSigner.privateKeyToAccountSigner(generatePrivateKey()),
-});
+// 2. Use signer as owner on Smart Account
 
 export default function Home() {
   const user = useUser();
@@ -93,12 +89,12 @@ export default function Home() {
           <UserCard />
         ) : (
           <>
-            <button className="btn btn-primary mt-6" onClick={handleModulerGenerateAccount}>
-              <p>Generate Moduler Account</p>
+            <button className="btn btn-primary mt-6 text-[4rem]" onClick={handleModulerGenerateAccount}>
+              <strong>NeverLost Wallet</strong>
               {generatedAddress ?? ""}
             </button>
             <button className="btn btn-primary" onClick={openAuthModal}>
-              Login
+              [Login]
             </button>
           </>
 

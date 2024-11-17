@@ -6,6 +6,11 @@ import React, { useState, useEffect } from "react";
 import { isHex } from "viem";
 import { z } from "zod";
 import initializeClient from './modularClientInit';
+// import { createWalletClient, http } from "viem";
+import { AlchemyWebSigner } from "@account-kit/signer";
+import { ethers } from 'ethers';
+
+// How to Use signer as owner on Smart Account
 
 
 const TurnkeyExportWalletContainerId = "turnkey-export-wallet-container-id";
@@ -32,6 +37,7 @@ const addOwners = async (newOwner: `0x${string}`, modularAccountClient: any) => 
     const result = await modularAccountClient.updateOwners({
       args: [[newOwner], []],
     });
+    console.log("Transaction Sent!");
     
     const txHash = await modularAccountClient.waitForUserOperationTransaction(result);
     console.log("Transaction Hash:", txHash);
@@ -45,7 +51,8 @@ const removeOwners = async (revertedOwner: `0x${string}`, modularAccountClient: 
       const result = await modularAccountClient.updateOwners({
         args: [[], [revertedOwner]],
       });
-      
+      console.log("Transaction sent!");
+
       const txHash = await modularAccountClient.waitForUserOperationTransaction(result);
       console.log("Transaction Hash:", txHash);
     } catch (error) {
@@ -53,7 +60,34 @@ const removeOwners = async (revertedOwner: `0x${string}`, modularAccountClient: 
     }
   };
 
+const sendTx = async(modularAccountClient, _to) => {
+    if(!_to){
+        alert("Please enter a recipient address.");
+        return;
+      }
+    console.log("modularAccountClient:", modularAccountClient);
+    const amountInEth = 0.0001;
+    const amountInWei = ethers.parseEther(amountInEth.toString());
+    try {
+        const result = await modularAccountClient.sendTransactions({
+            requests: [{
+                to: _to,
+                data: "0x", // or "0x",
+                value: amountInWei, // optional
+            }]
+        });
+        console.log("result:", result );
+        const txHash = await client.waitForUserOperationTransaction(result);
+        console.log("Transaction Hash:", txHash);
+    }catch(err){
+        console.error("Error updating owners:", err);
+    }
+}
+
+
+
 export const UserCard = () => {
+  // SmartAccountClient
   const [modularClient, setmodularClient] = useState<any>(null);
   const bundlerClient = useBundlerClient();
   // clinet: modulerAccountClinet
@@ -65,6 +99,8 @@ export const UserCard = () => {
   const [owners, setOwners] = useState<string[]>([]);
   const [newOwnerAddress, setNewOwnerAddress] = useState<string>("");
   const [revertOwnerAddress, setRevertOwnerAddress] = useState<string>("");
+  const [recipientAddress, setRecipientAddress] = useState('');
+  const [txMessage, setTxMessage] = useState<string>("");
 
   useEffect(() => {
     const initialize = async () => {
@@ -81,7 +117,7 @@ export const UserCard = () => {
     
   useEffect(() => {
     const fetchOwners = async () => {
-        console.log("address:", modularClient?.getAddress());
+        console.log("modularClient.address:", modularClient?.getAddress());
           try {
             const owners = await modularClient.readOwners(); // Await the promise
             console.log("owners:", owners);
@@ -94,6 +130,27 @@ export const UserCard = () => {
         fetchOwners();
     }
   }, [modularClient]);
+
+//   useEffect(() => {
+//     const signer = new AlchemyWebSigner({
+//         client: {
+//             connection: {
+//             apiKey: "API_KEY",
+//             },
+//             iframeConfig: {
+//             iframeContainerId: "alchemy-signer-iframe-container",
+//             },
+//         },
+//     });
+//   // additional logic to use Signer;
+//     return () => {
+//         // Cleanup if necessary (e.g., remove iframe if needed)
+//         const iframe = document.getElementById('turnkey-iframe');
+//         if (iframe) {
+//         iframe.remove(); // Remove the iframe if it exists
+//         }
+//     };
+//   });
 
   const { signMessage, signedMessage } = useSignMessage({
     client,
@@ -213,57 +270,24 @@ export const UserCard = () => {
                 />
             </div>
         </div>
-        <form.Provider>
-          <form
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "16px",
-              width: "100%",
-            }}
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              void form.handleSubmit();
-            }}
-          >
-            <form.Field
-              name="message"
-              validators={{
-                onBlur: z.string(),
-              }}
-            >
-              {(field) => (
-                <label className="daisy-form-control w-full flex flex-col gap-2">
-                  <strong>Sign Message ➡️➡️ Transfre Emrgency Money</strong>
-                  <div className="flex flex-row gap-2">
-                    <textarea
-                      placeholder="Type here"
-                      className="daisy-textarea daisy-textarea-bordered w-full text-black"
-                      name={field.name}
-                      value={field.state.value ?? ""}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    ></textarea>
-                  </div>
-                </label>
-              )}
-            </form.Field>
-            <form.Subscribe>
-              {({ canSubmit, isSubmitting }) => (
-                <button
-                  className="daisy-btn"
-                  disabled={!canSubmit || isSubmitting || isLoadingClient}
-                  type="submit"
-                >
-                  Submit
-                </button>
-              )}
-            </form.Subscribe>
-          </form>
-        </form.Provider>
+        
+        <div className="flex flex-col gap-2">
+            <strong>Emergency Trnasfer</strong>
+            <input
+            type="text"
+            placeholder="Enter recipient address"
+            value={recipientAddress}
+            onChange={(e) => setRecipientAddress(e.target.value)}
+            className="daisy-input text-black"
+            />
+            <button onClick={() => sendTx(modularClient, recipientAddress)} className="daisy-button">
+                [Transfer 0.0001 ETH]
+            </button>
+            <strong>⚡️CHECK THE RESULT⚡️</strong>
+        </div>
       </div>
       <button onClick={() => logout()}>Logout</button>
+      <div id="alchemy-signer-iframe-container"></div>
     </div>
   );
 };
