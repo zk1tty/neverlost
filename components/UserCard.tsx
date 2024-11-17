@@ -6,8 +6,6 @@ import React, { useState, useEffect } from "react";
 import { isHex } from "viem";
 import { z } from "zod";
 import initializeClient from './modularClientInit';
-// import { createWalletClient, http } from "viem";
-import { AlchemyWebSigner } from "@account-kit/signer";
 import { ethers } from 'ethers';
 
 // How to Use signer as owner on Smart Account
@@ -77,7 +75,7 @@ const sendTx = async(modularAccountClient, _to) => {
             }]
         });
         console.log("result:", result );
-        const txHash = await client.waitForUserOperationTransaction(result);
+        const txHash = await modularAccountClient.waitForUserOperationTransaction(result);
         console.log("Transaction Hash:", txHash);
     }catch(err){
         console.error("Error updating owners:", err);
