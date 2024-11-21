@@ -1,9 +1,10 @@
 import { LocalAccountSigner } from "@aa-sdk/core";
-import { alchemy, sepolia } from "@account-kit/infra";
+import { alchemy, sepolia, arbitrumSepolia } from "@account-kit/infra";
 import { createModularAccountAlchemyClient } from "@account-kit/smart-contracts";
 
 const MNEMONIC = "abandon ability able about above absent absorb abstract absurd abuse access accident";
-export const chain = sepolia;
+// TODO: change the chain to Arbitrum Sepolia.
+export const chain = arbitrumSepolia;
 
 async function initializeClient() {
   const modularAccountClient = await createModularAccountAlchemyClient({

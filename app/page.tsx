@@ -7,11 +7,6 @@ import {
   useUser,
 } from "@account-kit/react";
 import { UserCard } from "@/components/UserCard";
-import { createWalletClient, http } from "viem";
-import { AlchemyWebSigner } from "@account-kit/signer";
-import { sepolia, alchemy } from "@account-kit/infra";
-import { LocalAccountSigner } from "@aa-sdk/core";
-import { generatePrivateKey } from "viem/accounts";
  
 
 // Point

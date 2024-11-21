@@ -28,3 +28,5 @@ Their wallet will have the ownership of the main ModularAccount.
 - Network: Ethereum Sepolia testnet
 - Modular Account: [0x11C3B85374215863c8C1B92B0c14E76c9284863d](https://sepolia.etherscan.io/address/0x11C3B85374215863c8C1B92B0c14E76c9284863d#tokentxns)
 
+- Network: Arbitrum Sepolia testnet
+- Smart Contract Account: [0x11C3B85374215863c8C1B92B0c14E76c9284863d](https://sepolia.arbiscan.io/address/0x11C3B85374215863c8C1B92B0c14E76c9284863d)
